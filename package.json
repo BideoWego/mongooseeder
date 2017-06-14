@@ -11,5 +11,11 @@
     "seed"
   ],
   "author": "bideowego@gmail.com",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "mongoose": "^4.10.6"
+  },
+  "devDependencies": {
+    "jasmine": "^2.6.0"
+  }
 }
