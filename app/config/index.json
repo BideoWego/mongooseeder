@@ -2,10 +2,6 @@
   "test": {
     "database": "mongooseeder_test",
     "host": "localhost"
-  },
-  "development": {
-    "database": "mongooseeder_test",
-    "host": "localhost"
   }
 }
 

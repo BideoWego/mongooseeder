@@ -1,0 +1,9 @@
+
+
+module.exports = {
+  "config": "./app/config/",
+  "seeds": "./app/seeds",
+  "models": "./app/models"
+};
+
+

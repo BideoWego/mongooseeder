@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 
 module.exports = () => {
-
   // Get all collections
   let collections = mongoose
     .connection

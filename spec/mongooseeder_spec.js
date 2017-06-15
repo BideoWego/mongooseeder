@@ -32,12 +32,12 @@ describe('Mongooseeder', () => {
     ,
     ].join('\n');
 
-    const rootDir = `${ path.resolve('.') }/spec/app/`;
-    const seedsDir = `${ path.resolve('.') }/spec/app/seeds/`;
+    const root = `${ path.resolve('.') }/spec/app/`;
+    const seeds = `${ path.resolve('.') }/spec/app/seeds/`;
     const seedsFile = `${ path.resolve('.') }/spec/app/seeds/index.js`;
 
     const mongooseeder = new Mongooseeder({
-      rootDir: `${ path.resolve('.') }/spec/app/`
+      root: `${ path.resolve('.') }/spec/app/`
     });
 
     fs.rmdir(`${ path.resolve('.') }/spec/app/seeds/`, err => {
@@ -49,55 +49,67 @@ describe('Mongooseeder', () => {
   });
 
 
-  it('seeds', (done) => {
-    const oldPwd = process.env.PWD;
-    process.env.PWD = path.resolve('./app');
+  describe('cli', () => {
+    const oldPwd = process.env.PWD
 
-    const mongooseeder = new Mongooseeder();
 
-    mongooseeder.seed()
-      .then(() => User.findOne())
-      .then(user => {
-        expect(user).not.toBe(undefined);
-        expect(user).not.toBe(null);
-      })
-      .then(() => Post.findOne())
-      .then(post => {
-        expect(post).not.toBe(undefined);
-        expect(post).not.toBe(null);
-        done();
-        process.env.PWD = oldPwd;
+    beforeEach(() => {
+      process.env.PWD = path.resolve('./app');
+    });
+
+
+    afterEach(() => {
+      process.env.PWD = oldPwd;
+    });
+
+
+    it('seeds', (done) => {
+      const mongooseeder = new Mongooseeder();
+
+      mongooseeder.seed()
+        .then(() => User.findOne())
+        .then(user => {
+          expect(user).not.toBe(undefined);
+          expect(user).not.toBe(null);
+        })
+        .then(() => Post.findOne())
+        .then(post => {
+          expect(post).not.toBe(undefined);
+          expect(post).not.toBe(null);
+          done();
+        });
+    });
+
+
+    it('outputs a help message', () => {
+      const mongooseeder = new Mongooseeder();
+      console.log = jasmine.createSpy('log');
+      mongooseeder.help();
+      expect(console.log).toHaveBeenCalledWith([
+        ,
+        'Mongooseeder',
+        '============',
+        ,
+        'Commands:',
+        '  help      Output help information',
+        '  init      Create a seeds file if none exists',
+        '  seed      Run the current seeds file',
+        '  clean     Clean the database',
+        ,
+        ,
+      ].join('\n'));
+    });
+
+
+    it('calls the correct method when passed via CLI', () => {
+      const mongooseeder = new Mongooseeder();
+      const methods = ['help', 'init', 'seed'];
+      methods.forEach(method => {
+        process.argv = [,,method];
+        mongooseeder[method] = jasmine.createSpy(method);
+        mongooseeder.cli();
+        expect(mongooseeder[method]).toHaveBeenCalled();
       });
-  });
-
-
-  it('outputs a help message', () => {
-    const mongooseeder = new Mongooseeder();
-    console.log = jasmine.createSpy('log');
-    mongooseeder.help();
-    expect(console.log).toHaveBeenCalledWith([
-      ,
-      'Mongooseeder',
-      '============',
-      ,
-      'Commands:',
-      '  help      Output help information',
-      '  init      Create a seeds file if none exists',
-      '  seed      Run the current seeds file',
-      ,
-      ,
-    ].join('\n'));
-  });
-
-
-  it('calls the correct method when passed via CLI', () => {
-    const mongooseeder = new Mongooseeder();
-    const methods = ['help', 'init', 'seed'];
-    methods.forEach(method => {
-      process.argv = [,,method];
-      mongooseeder[method] = jasmine.createSpy(method);
-      mongooseeder.cli();
-      expect(mongooseeder[method]).toHaveBeenCalled();
     });
   });
 
@@ -109,7 +121,7 @@ describe('Mongooseeder', () => {
 
     beforeEach(() => {
       mongooseeder = new Mongooseeder({
-        rootDir: path.resolve('./spec/app')
+        root: path.resolve('./spec/app')
       });
 
       delete require.cache[rcPath];
@@ -125,17 +137,17 @@ describe('Mongooseeder', () => {
 
     it('recognizes and loads the rc file', () => {
       const data = JSON.stringify({
-        seedsDir: './foobar',
-        modelsDir: './fizbaz'
+        seeds: './foobar',
+        models: './fizbaz'
       });
       fs.writeFileSync(rcPath, `module.exports = ${ data };`);
       const mongooseeder = new Mongooseeder({
-        rootDir: path.resolve('./spec/app')
+        root: path.resolve('./spec/app')
       });
-      expect(mongooseeder.seedsDir).toBe(
+      expect(mongooseeder.seeds).toBe(
         path.resolve('.', `./spec/app/foobar`)
       );
-      expect(mongooseeder.modelsDir).toBe(
+      expect(mongooseeder.models).toBe(
         path.resolve('.', `./spec/app/fizbaz`)
       );
     });
@@ -144,22 +156,19 @@ describe('Mongooseeder', () => {
     it('uses a custom clean function from rc file', done => {
       fs.writeFileSync(rcPath, `module.exports = { clean: function() {} };`);
       const mongooseeder = new Mongooseeder({
-        rootDir: path.resolve('./spec/app'),
-        seedsDir: './seeds',
-        modelsDir: './models'
+        root: path.resolve('./spec/app'),
+        seeds: './seeds',
+        models: './models'
       });
-      expect(typeof mongooseeder.clean).toBe("function");
-      mongooseeder.clean = jasmine.createSpy('clean');
+      expect(typeof mongooseeder.customCleaner).toBe("function");
+      mongooseeder.customCleaner = jasmine.createSpy('customCleaner');
       mongooseeder.seed()
         .then(() => {
-          expect(mongooseeder.clean).toHaveBeenCalled();
+          expect(mongooseeder.customCleaner).toHaveBeenCalled();
           done();
         });
     });
   });
-
-
-
 });
 
 

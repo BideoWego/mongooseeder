@@ -1,8 +1,7 @@
 const path = require('path');
 const mongoose = require('mongoose');
-const clean = require('./mongodb/clean');
-const connect = require('./mongodb/connect');
 const fs = require('fs');
+const env = process.env.NODE_ENV || 'development';
 
 
 mongoose.Promise = require('bluebird');
@@ -26,6 +25,42 @@ const log = (...args) => {
 };
 
 
+const clean = () => {
+  // Get all collections
+  let collections = mongoose
+    .connection
+    .collections;
+
+  // Get collection names
+  let collectionKeys = Object.keys(collections);
+
+  // Store promises
+  let promises = [];
+
+  // For each collection
+  collectionKeys.forEach((key) => {
+
+    // Remove all documents
+    const promise = collections[key].remove();
+    promises.push(promise);
+  });
+
+  return Promise.all(promises);
+};
+
+
+const connect = (config) => {
+  if (mongoose.connection.readyState) {
+    return Promise.resolve();
+  }
+
+  var envUrl = process.env[config.use_env_variable];
+  var localUrl = `mongodb://${ config.host }/${ config.database }`;
+  var mongoUrl =  envUrl ? envUrl : localUrl;
+  return mongoose.connect(mongoUrl);
+};
+
+
 const seedsFileContent = `
 
 module.exports = () => {
@@ -45,6 +80,7 @@ Commands:
   help      Output help information
   init      Create a seeds file if none exists
   seed      Run the current seeds file
+  clean     Clean the database
 
 `;
 
@@ -55,24 +91,30 @@ Commands:
 
 class Mongooseeder {
   constructor(options={}) {
-    this.rootDir = options.rootDir ?
-      path.resolve(options.rootDir) :
+    this.root = options.root ?
+      path.resolve(options.root) :
       process.env.PWD;
 
-    const rcPath = `${ this.rootDir }/${ rcFilename}`;
+    const rcPath = `${ this.root }/${ rcFilename}`;
     if (fs.existsSync(rcPath)) {
       options = require(rcPath);
-      this.clean = options.clean;
+      this.customCleaner = options.clean;
     }
 
-    this.seedsDir = path.resolve(
-      this.rootDir,
-      options.seedsDir || './seeds'
+    const configPath = path.resolve(
+      this.root,
+      options.config || './config'
+    );
+    this.config = require(configPath)[env];
+
+    this.seeds = path.resolve(
+      this.root,
+      options.seeds || './seeds'
     );
 
-    this.modelsDir = path.resolve(
-      this.rootDir,
-      options.modelsDir || './models'
+    this.models = path.resolve(
+      this.root,
+      options.models || './models'
     );
   }
 
@@ -84,11 +126,11 @@ class Mongooseeder {
 
   init() {
     log('Initializing Mongooseeder...');
-    if (!fs.existsSync(this.seedsDir)) {
+    if (!fs.existsSync(this.seeds)) {
       log('Creating seeds file...');
-      fs.mkdirSync(this.seedsDir);
+      fs.mkdirSync(this.seeds);
       fs.writeFileSync(
-        `${ this.seedsDir }/index.js`,
+        `${ this.seeds }/index.js`,
         seedsFileContent
       );
     } else {
@@ -100,18 +142,17 @@ class Mongooseeder {
 
   seed() {
     // Clean
-    return connect()
-      .then(() => log('Cleaning database...'))
-      .then(() => (this.clean && this.clean()) || clean())
+    return this._connect()
+      .then(() => this.clean())
 
     // Load models
       .then(() => log('Loading models...'))
-      .then(() => require(this.modelsDir))
+      .then(() => require(this.models))
       .then(models => globalize(models))
 
     // Seed
       .then(() => log('Seeding...'))
-      .then(() => require(this.seedsDir)())
+      .then(() => require(this.seeds)())
 
     // Done
       .then(() => log('Done.'));
@@ -128,10 +169,24 @@ class Mongooseeder {
     }
 
     if (this._isValidCommand(command)) {
-      this[command]();
+      const result = this[command]()
+      if (result && result.then) {
+        result.then(() => process.exit());
+      }
     } else {
       log(`MongooseederError: '${ command }' is not a valid command`);
     }
+  }
+
+
+  clean() {
+    return this._connect()
+      .then(() => log('Cleaning database...'))
+      .then(
+        (this.customCleaner && this.customCleaner())
+          || clean()
+      )
+      .then(() => log('Clean!'));
   }
 
 
@@ -139,8 +194,14 @@ class Mongooseeder {
     return [
       'init',
       'help',
-      'seed'
+      'seed',
+      'clean'
     ].includes(command);
+  }
+
+
+  _connect() {
+    return connect(this.config);
   }
 }
 

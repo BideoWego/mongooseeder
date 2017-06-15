@@ -26,7 +26,7 @@ Commands:
   help      Output help information
   init      Create a seeds file if none exists
   seed      Run the current seeds file
-
+  clean     Clean the database
 
 ```
 
@@ -42,10 +42,34 @@ Commands:
 #### `seed`
 - Run the current seeds file
 
+#### `clean`
+- Clean the database
+
 
 ## Default Setup
 
 Mongooseeder works out of the box with the following default folder/file structure.
+
+
+### Mongoose Config
+
+It is normal to have a JSON file with configuration options for different environments. By default, Mongooseeder expects this file to be an `index.json` file in the `config/` directory of your project. The format that Mongooseeder expects is as follows:
+
+```javascript
+{
+  "development": {
+    "database": "DATABASE_NAME_development",
+    "host": "localhost"
+  }
+  "test": {
+    "database": "DATABASE_NAME_test",
+    "host": "localhost"
+  },
+  "production": {
+    "use_env_variable": "MONGODB_URI"
+  }
+}
+```
 
 
 ### Models
@@ -129,16 +153,17 @@ module.exports = () => {
 ```
 
 
-## Configuring with a `.mongooseederrc` File
+## Configuring Mongooseeder with a `.mongooseederrc` File
 
-If you must use a different folder structure than the default you can create a `.mongooseederrc` file in your project's root directory and configure Mongooseeder in there. Export an object with the keys `seedsDir` and `modelsDir` set to the appropriate paths. You can use relative paths as Mongooseeder will resolve them to absolute paths under the hood:
+If you must use a different folder structure than the default you can create a `.mongooseederrc` file in your project's root directory and configure Mongooseeder in there. Export an object with the keys set to the appropriate paths for the files Mongooseeder requires. You can use relative paths as Mongooseeder will resolve them to absolute paths under the hood:
 
 ```javascript
 // .mongooseederrc
 
 module.exports = {
-  seedsDir: './foobar',
-  modelsDir: './fizbaz'
+  config: './new_config_directory/some_file.json',
+  seeds: './new_seeds_directory/some_file.js',
+  models: './new_models_directory'
 };
 ```
 
@@ -154,8 +179,8 @@ const mongoose = require('mongoose');
 const models = require('./models');
 
 module.exports = {
-  seedsDir: './foobar',
-  modelsDir: './fizbaz',
+  seeds: './foobar',
+  models: './fizbaz',
   clean: function() {
     // Clean database with custom
     // code here and return a promise
