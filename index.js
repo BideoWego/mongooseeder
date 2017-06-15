@@ -7,6 +7,12 @@ const fs = require('fs');
 
 mongoose.Promise = require('bluebird');
 
+// ----------------------------------------
+// Private
+// ----------------------------------------
+
+const rcFilename = '.mongooseederrc';
+
 
 const globalize = (models) => {
   Object.keys(models).forEach((modelName) => {
@@ -43,15 +49,26 @@ Commands:
 `;
 
 
+// ----------------------------------------
+// Public
+// ----------------------------------------
+
 class Mongooseeder {
   constructor(options={}) {
     this.rootDir = options.rootDir ?
       path.resolve(options.rootDir) :
       process.env.PWD;
+
+    const rcPath = `${ this.rootDir }/${ rcFilename}`;
+    if (fs.existsSync(rcPath)) {
+      options = require(rcPath);
+    }
+
     this.seedsDir = path.resolve(
       this.rootDir,
       options.seedsDir || './seeds'
     );
+
     this.modelsDir = path.resolve(
       this.rootDir,
       options.modelsDir || './models'

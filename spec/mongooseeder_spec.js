@@ -100,6 +100,26 @@ describe('Mongooseeder', () => {
       expect(mongooseeder[method]).toHaveBeenCalled();
     });
   });
+
+
+  it('recognizes and loads the rc file', () => {
+    const rcPath = `${ path.resolve('.') }/spec/app/.mongooseederrc`;
+    const data = JSON.stringify({
+      seedsDir: './foobar',
+      modelsDir: './fizbaz'
+    });
+    fs.writeFileSync(rcPath, `module.exports = ${ data };`);
+    const mongooseeder = new Mongooseeder({
+      rootDir: path.resolve('./spec/app')
+    });
+    expect(mongooseeder.seedsDir).toBe(
+      path.resolve('.', `./spec/app/foobar`)
+    );
+    expect(mongooseeder.modelsDir).toBe(
+      path.resolve('.', `./spec/app/fizbaz`)
+    );
+    fs.unlinkSync(rcPath);
+  });
 });
 
 
