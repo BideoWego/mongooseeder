@@ -4,7 +4,8 @@
   "description": "Mongoose model seeding",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "which nodemon > /dev/null && nodemon --exec npm run jasmine || npm run jasmin",
+    "jasmine": "node_modules/jasmine/bin/jasmine.js"
   },
   "keywords": [
     "mongoose",
@@ -13,9 +14,11 @@
   "author": "bideowego@gmail.com",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "mongoose": "^4.10.6"
   },
   "devDependencies": {
+    "bluebird": "^3.5.0",
     "jasmine": "^2.6.0"
   }
 }
