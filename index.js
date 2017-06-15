@@ -16,10 +16,9 @@ const globalize = (models) => {
 
 
 const log = (...args) => {
-  if (process.env.NODE_ENV !== 'test') {
-    console.log(...args);
-  }
+  console.log(...args);
 };
+
 
 const seedsFileContent = `
 
@@ -28,6 +27,18 @@ module.exports = () => {
   // you're done seeding
   return Promise.resolve();
 };
+
+`;
+
+
+const helpMessage = `
+Mongooseeder
+============
+
+Commands:
+  help      Output help information
+  init      Create a seeds file if none exists
+  seed      Run the current seeds file
 
 `;
 
@@ -47,6 +58,12 @@ class Mongooseeder {
     );
   }
 
+
+  help() {
+    log(helpMessage);
+  }
+
+
   init() {
     log('Initializing Mongooseeder...');
     if (!fs.existsSync(this.seedsDir)) {
@@ -56,9 +73,12 @@ class Mongooseeder {
         `${ this.seedsDir }/index.js`,
         seedsFileContent
       );
+    } else {
+      log('Seeds file already exists');
     }
     log('Done.');
   }
+
 
   seed() {
     // Clean
@@ -77,6 +97,32 @@ class Mongooseeder {
 
     // Done
       .then(() => log('Done.'));
+  }
+
+
+  cli() {
+    const args = process.argv;
+    const command = args[2];
+
+    if (!command) {
+      this.help();
+      return;
+    }
+
+    if (this._isValidCommand(command)) {
+      this[command]();
+    } else {
+      log(`MongooseederError: '${ command }' is not a valid command`);
+    }
+  }
+
+
+  _isValidCommand(command) {
+    return [
+      'init',
+      'help',
+      'seed'
+    ].includes(command);
   }
 }
 

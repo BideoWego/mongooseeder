@@ -4,7 +4,7 @@
   "description": "Mongoose model seeding",
   "main": "index.js",
   "scripts": {
-    "test": "which nodemon > /dev/null && nodemon --exec npm run jasmine || npm run jasmin",
+    "test": "which nodemon > /dev/null && nodemon --exec npm run jasmine || npm run jasmine",
     "jasmine": "node_modules/jasmine/bin/jasmine.js"
   },
   "keywords": [
@@ -18,7 +18,9 @@
     "mongoose": "^4.10.6"
   },
   "devDependencies": {
-    "bluebird": "^3.5.0",
     "jasmine": "^2.6.0"
+  },
+  "bin": {
+    "mongooseeder": "bin/mongooseeder"
   }
 }

@@ -1,0 +1,12 @@
+#! /usr/bin/env node
+
+const Mongooseeder = require('./../');
+
+const mongooseeder = new Mongooseeder();
+mongooseeder.cli();
+
+
+
+
+
+
