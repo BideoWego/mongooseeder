@@ -143,6 +143,28 @@ module.exports = {
 ```
 
 
+### Custom Database Cleaning
+
+Mongooseeder will clean the database (completely removing all documents from all collections) before every seed by default. If you wish to clean the database in a different manner you'll have to override the cleaning function with your own in the `.mongooseederrc` file:
+
+```javascript
+// .mongooseederrc
+
+const mongoose = require('mongoose');
+const models = require('./models');
+
+module.exports = {
+  seedsDir: './foobar',
+  modelsDir: './fizbaz',
+  clean: function() {
+    // Clean database with custom
+    // code here and return a promise
+    return Promise.resolve();
+  }
+};
+```
+
+
 
 ## License: MIT
 

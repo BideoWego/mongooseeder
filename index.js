@@ -62,6 +62,7 @@ class Mongooseeder {
     const rcPath = `${ this.rootDir }/${ rcFilename}`;
     if (fs.existsSync(rcPath)) {
       options = require(rcPath);
+      this.clean = options.clean;
     }
 
     this.seedsDir = path.resolve(
@@ -101,7 +102,7 @@ class Mongooseeder {
     // Clean
     return connect()
       .then(() => log('Cleaning database...'))
-      .then(() => clean())
+      .then(() => (this.clean && this.clean()) || clean())
 
     // Load models
       .then(() => log('Loading models...'))

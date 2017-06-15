@@ -102,24 +102,64 @@ describe('Mongooseeder', () => {
   });
 
 
-  it('recognizes and loads the rc file', () => {
+  describe('rc file', () => {
     const rcPath = `${ path.resolve('.') }/spec/app/.mongooseederrc`;
-    const data = JSON.stringify({
-      seedsDir: './foobar',
-      modelsDir: './fizbaz'
+    const removeRc = () => fs.existsSync(rcPath) && fs.unlinkSync(rcPath);
+    let mongooseeder;
+
+    beforeEach(() => {
+      mongooseeder = new Mongooseeder({
+        rootDir: path.resolve('./spec/app')
+      });
+
+      delete require.cache[rcPath];
+
+      removeRc();
     });
-    fs.writeFileSync(rcPath, `module.exports = ${ data };`);
-    const mongooseeder = new Mongooseeder({
-      rootDir: path.resolve('./spec/app')
+
+
+    afterEach(() => {
+      removeRc();
     });
-    expect(mongooseeder.seedsDir).toBe(
-      path.resolve('.', `./spec/app/foobar`)
-    );
-    expect(mongooseeder.modelsDir).toBe(
-      path.resolve('.', `./spec/app/fizbaz`)
-    );
-    fs.unlinkSync(rcPath);
+
+
+    it('recognizes and loads the rc file', () => {
+      const data = JSON.stringify({
+        seedsDir: './foobar',
+        modelsDir: './fizbaz'
+      });
+      fs.writeFileSync(rcPath, `module.exports = ${ data };`);
+      const mongooseeder = new Mongooseeder({
+        rootDir: path.resolve('./spec/app')
+      });
+      expect(mongooseeder.seedsDir).toBe(
+        path.resolve('.', `./spec/app/foobar`)
+      );
+      expect(mongooseeder.modelsDir).toBe(
+        path.resolve('.', `./spec/app/fizbaz`)
+      );
+    });
+
+
+    it('uses a custom clean function from rc file', done => {
+      fs.writeFileSync(rcPath, `module.exports = { clean: function() {} };`);
+      const mongooseeder = new Mongooseeder({
+        rootDir: path.resolve('./spec/app'),
+        seedsDir: './seeds',
+        modelsDir: './models'
+      });
+      expect(typeof mongooseeder.clean).toBe("function");
+      mongooseeder.clean = jasmine.createSpy('clean');
+      mongooseeder.seed()
+        .then(() => {
+          expect(mongooseeder.clean).toHaveBeenCalled();
+          done();
+        });
+    });
   });
+
+
+
 });
 
 
