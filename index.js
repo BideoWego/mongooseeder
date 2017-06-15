@@ -2,6 +2,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const env = process.env.NODE_ENV || 'development';
+const argv = require('yargs').argv;
 
 
 mongoose.Promise = require('bluebird');
@@ -116,6 +117,10 @@ class Mongooseeder {
       this.root,
       options.models || './models'
     );
+
+    if (argv.debug) {
+      console.info(this);
+    }
   }
 
 
@@ -161,7 +166,7 @@ class Mongooseeder {
 
   cli() {
     const args = process.argv;
-    const command = args[2];
+    const command = argv._[0];
 
     if (!command) {
       this.help();

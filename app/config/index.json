@@ -1,4 +1,8 @@
 {
+  "development": {
+    "database": "mongooseeder_development",
+    "host": "localhost"
+  },
   "test": {
     "database": "mongooseeder_test",
     "host": "localhost"
