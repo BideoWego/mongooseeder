@@ -14,10 +14,27 @@ const rcFilename = '.mongooseederrc';
 
 
 const globalize = (models) => {
-  Object.keys(models).forEach((modelName) => {
+  const unregisteredModels = [];
+  const discriminators = [];
+
+  for (let modelName in models) {
     const model = models[modelName];
-    mongoose.model(modelName, model.schema);
-    global[modelName] = mongoose.model(modelName);
+    if (model.discriminators) {
+      mongoose.model(model.modelName, model.schema);
+      model.discriminators.forEach(discriminator => {
+        model.discriminator(discriminator.modelName, discriminator.schema);
+        discriminators.push(discriminator.modelName);
+      });
+    } else {
+      unregisteredModels.push(model);
+    }
+  }
+
+  unregisteredModels.forEach(model => {
+    if (!discriminators.includes(model.modelName)) {
+      const modelName = model.modelName;
+      global[modelName] = mongoose.model(modelName);
+    }
   });
 };
 
