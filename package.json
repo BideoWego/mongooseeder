@@ -1,6 +1,6 @@
 {
   "name": "mongooseeder",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Mongoose model seeding",
   "main": "index.js",
   "scripts": {
