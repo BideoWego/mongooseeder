@@ -13,11 +13,9 @@
   ],
   "author": "bideowego@gmail.com",
   "license": "MIT",
-  "dependencies": {
-    "bluebird": "^3.5.0",
-    "yargs": "^8.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "bluebird": "^3.5.0",
     "jasmine": "^2.6.0",
     "mongoose": "^4.10.6"
   },

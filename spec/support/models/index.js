@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 const bluebird = require('bluebird');
 
-mongoose.Promise = bluebird;
 
-// Enable logging if not testing
-(process.env.NODE_ENV === 'test') ||
-  mongoose.set('debug', true);
+mongoose.Promise = bluebird;
 
 
 const models = {};
 
+
+// Load models and attach to models here
+models.User = require('./user');
 
 
 
