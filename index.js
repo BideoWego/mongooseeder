@@ -21,10 +21,11 @@ const globalize = (models) => {
     const model = models[modelName];
     if (model.discriminators) {
       mongoose.model(model.modelName, model.schema);
-      model.discriminators.forEach(discriminator => {
+      for (let discriminatorName in model.discriminators) {
+        const discriminator = model.discriminators[discriminatorName];
         model.discriminator(discriminator.modelName, discriminator.schema);
         discriminators.push(discriminator.modelName);
-      });
+      }
     } else {
       unregisteredModels.push(model);
     }
