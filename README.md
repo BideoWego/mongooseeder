@@ -1,8 +1,9 @@
 # Mongooseeder
 by [Bideo Wego](https://github.com/BideoWego)
+View [Mongooseeder on NPM](https://www.npmjs.com/package/mongooseeder).
 
 
-Mongoose seeding.
+Simple Mongoose seeding. Mongooseeder wraps the process of connecting to MongoDB through Mongoose, cleaning old data, and seeding new data. It provides a straightforward interface to minimize the code necessary for seeding.
 
 
 ## Installation
