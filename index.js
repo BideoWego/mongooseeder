@@ -14,8 +14,6 @@ const rcFilename = '.mongooseederrc';
 
 
 const globalize = (models) => {
-  console.info('globalize collections', Object.keys(mongoose.connection.collections));
-  console.info('globalize models', Object.keys(models))
   Object.keys(models).forEach((modelName) => {
     global[modelName] = mongoose.model(modelName);
   });
@@ -156,12 +154,6 @@ class Mongooseeder {
     // Load models
       .then(() => log('Loading models...'))
       .then(() => require(this.models))
-      .then(models => {
-        if (this.argv.debug) {
-          console.info(models);
-        }
-        return models;
-      })
       .then(models => globalize(models))
 
     // Seed
@@ -197,10 +189,10 @@ class Mongooseeder {
   clean() {
     return this._connect()
       .then(() => log('Cleaning database...'))
-      .then(
+      .then(() => {
         (this.customCleaner && this.customCleaner())
           || clean()
-      )
+      })
       .then(() => log('Clean!'))
       .catch(err => console.error(err));
   }
