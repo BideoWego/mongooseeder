@@ -158,7 +158,7 @@ class Mongooseeder {
     // Load models
       .then(() => log('Loading models...'))
       .then(() => log('Ready State', mongoose.connection.readyState))
-      .then(() => require(this.models))
+      .then(() => this.models = require(this.models))
       .then(models => globalize(models))
 
     // Seed
