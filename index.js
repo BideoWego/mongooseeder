@@ -190,7 +190,7 @@ class Mongooseeder {
     return this._connect()
       .then(() => log('Cleaning database...'))
       .then(() => {
-        (this.customCleaner && this.customCleaner())
+        return (this.customCleaner && this.customCleaner())
           || clean()
       })
       .then(() => log('Clean!'))
