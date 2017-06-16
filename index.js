@@ -73,7 +73,8 @@ Mongooseeder.seed = (options) => {
     .then(() => console.log('Seeding...'))
     .then(() => seeds())
     .then(() => console.log('Done.'))
-    .catch(err => { throw err; });
+    .catch(err => { throw err; })
+    .then(() => mongoose.disconnect());
 };
 
 
@@ -96,8 +97,9 @@ Mongooseeder.clean = (options) => {
     .then(() => console.log('Cleaning...'))
     .then(() => _clean(models))
     .then(() => console.log('Done.'))
-    .catch(err => { throw err; });
-}
+    .catch(err => { throw err; })
+    .then(() => mongoose.disconnect());
+};
 
 
 
