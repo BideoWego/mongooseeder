@@ -14,6 +14,7 @@ const rcFilename = '.mongooseederrc';
 
 
 const globalize = (models) => {
+  console.info('globalize', Object.keys(mongoose.connection.collections));
   Object.keys(models).forEach((modelName) => {
     global[modelName] = mongoose.model(modelName);
   });
