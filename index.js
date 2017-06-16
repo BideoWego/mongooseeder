@@ -1,12 +1,10 @@
 "use strict";
 
 const path = require('path');
-const mongoose = require('mongoose');
 const fs = require('fs');
 const env = process.env.NODE_ENV || 'development';
 
-
-mongoose.Promise = require('bluebird');
+let mongoose;
 
 // ----------------------------------------
 // Private
@@ -52,6 +50,9 @@ const clean = () => {
 
 
 const connect = (config) => {
+  mongoose = require('mongoose');
+  mongoose.Promise = require('bluebird');
+
   if (mongoose.connection.readyState) {
     return Promise.resolve();
   }
