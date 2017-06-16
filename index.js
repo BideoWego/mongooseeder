@@ -2,7 +2,6 @@ const path = require('path');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const env = process.env.NODE_ENV || 'development';
-const argv = require('yargs').argv;
 
 
 mongoose.Promise = require('bluebird');
@@ -92,6 +91,8 @@ Commands:
 
 class Mongooseeder {
   constructor(options={}) {
+    this.argv = require('yargs').argv;
+
     this.root = options.root ?
       path.resolve(options.root) :
       process.env.PWD;
@@ -118,7 +119,7 @@ class Mongooseeder {
       options.models || './models'
     );
 
-    if (argv.debug) {
+    if (this.argv.debug) {
       console.info(this);
     }
   }
@@ -153,6 +154,12 @@ class Mongooseeder {
     // Load models
       .then(() => log('Loading models...'))
       .then(() => require(this.models))
+      .then(models => {
+        if (this.argv.debug) {
+          console.info(models);
+        }
+        return models;
+      })
       .then(models => globalize(models))
 
     // Seed
@@ -160,13 +167,14 @@ class Mongooseeder {
       .then(() => require(this.seeds)())
 
     // Done
-      .then(() => log('Done.'));
+      .then(() => log('Done.'))
+      .catch(err => console.error(err));
   }
 
 
   cli() {
     const args = process.argv;
-    const command = argv._[0];
+    const command = args[2];
 
     if (!command) {
       this.help();
@@ -174,7 +182,7 @@ class Mongooseeder {
     }
 
     if (this._isValidCommand(command)) {
-      const result = this[command]()
+      const result = this[command]();
       if (result && result.then) {
         result.then(() => process.exit());
       }
@@ -191,7 +199,8 @@ class Mongooseeder {
         (this.customCleaner && this.customCleaner())
           || clean()
       )
-      .then(() => log('Clean!'));
+      .then(() => log('Clean!'))
+      .catch(err => console.error(err));
   }
 
 

@@ -105,7 +105,7 @@ describe('Mongooseeder', () => {
       const mongooseeder = new Mongooseeder();
       const methods = ['help', 'init', 'seed'];
       methods.forEach(method => {
-        process.argv = [,,method];
+        process.argv = [,,method, '--debug'];
         mongooseeder[method] = jasmine.createSpy(method);
         mongooseeder.cli();
         expect(mongooseeder[method]).toHaveBeenCalled();
