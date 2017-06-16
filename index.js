@@ -15,6 +15,8 @@ const rcFilename = '.mongooseederrc';
 
 const globalize = (models) => {
   Object.keys(models).forEach((modelName) => {
+    const model = models[modelName];
+    mongoose.model(modelName, model.schema);
     global[modelName] = mongoose.model(modelName);
   });
 };
@@ -157,8 +159,7 @@ class Mongooseeder {
 
     // Load models
       .then(() => log('Loading models...'))
-      .then(() => log('Ready State', mongoose.connection.readyState))
-      .then(() => this.models = require(this.models))
+      .then(() => require(this.models))
       .then(models => globalize(models))
 
     // Seed
