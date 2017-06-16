@@ -1,3 +1,5 @@
+"use strict";
+
 const path = require('path');
 const mongoose = require('mongoose');
 const fs = require('fs');
