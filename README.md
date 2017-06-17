@@ -84,7 +84,7 @@ mongooseeder.seed({
 
 Mongooseeder provides a `.clean()` method for convenience if you wish to separate the cleaning process from the seeding process. Cleaning can be done by calling `.clean()` and providing the following parameters:
 
-1. `mongodbUrl` or `host` and `database`: `String or Object`, MongoDB connection parameters
+1. `mongodbUrl` or `host` and `database`: `String`, MongoDB connection parameters
 1. `models`: `Object`, each key is the model name and the value is the model class object
     - Example: `{ User: User }`
 1. `mongoose`: The `mongoose` instance you require in your seeds file
