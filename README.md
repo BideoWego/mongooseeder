@@ -36,7 +36,7 @@ mongooseeder.seed({
   //...
 });
 
-// Connecting with URL
+// Connecting with host and database name
 mongooseeder.seed({
   database: 'your_database_name_here',
   host: 'localhost',
@@ -49,7 +49,7 @@ mongooseeder.seed({
 
 Seeding can be done by calling `.seed()` and providing the following parameters:
 
-1. `mongodbUrl` or `host` and `database`: `String or Object`, MongoDB connection parameters
+1. `mongodbUrl` or `host` and `database`: `String`, MongoDB connection parameters
 1. `models`: `Object`, each key is the model name and the value is the model class object
     - Example: `{ User: User }`
 1. `clean`: `Boolean`, if `true`, all provided models in the `models` parameter will have all documents removed from their collections.
@@ -71,6 +71,9 @@ mongooseeder.seed({
   clean: true,
   mongoose: mongoose,
   seeds: () => {
+
+    // Run your seeds here
+    // Example:
     return models.User.create({ email });
   }
 });
@@ -106,27 +109,6 @@ mongooseeder.clean({
 ### Creating an NPM Command
 
 It can be useful to create an NPM script in your `package.json` to run seeds and create a file specifically for the seeding process. Then you can run your seeds file with the same command across multiple projects provided the same NPM script is set.
-
-```javascript
-// seeds/index.js
-
-
-const mongoose = require('mongoose');
-const mongooseeder = require('mongooseeder');
-const models = require('./path/to/models');
-
-const mongodbUrl = 'mongodb://localhost/your_db';
-
-mongooseeder.seed({
-  mongodbUrl: mongodbUrl,
-  models: models,
-  clean: true,
-  mongoose: mongoose,
-  seeds: () => {
-    return models.User.create({ email });
-  }
-});
-```
 
 ```javascript
 // package.json
