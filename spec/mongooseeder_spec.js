@@ -6,14 +6,22 @@ const models = require('./support/models');
 describe('Mongooseeder', () => {
   const mongodbUrl = 'mongodb://localhost/mongooseeder_test';
   let oldConsoleLog;
+  let oldMongooseDisconnect;
+  let User;
 
   beforeEach(() => {
+    oldMongooseDisconnect = mongoose.disconnect;
+    mongoose.disconnect = () => {};
+
     oldConsoleLog = console.log;
     console.log = () => {};
+
+    User = mongoose.model('User');
   });
 
 
   afterEach(() => {
+    mongoose.disconnect = oldMongooseDisconnect;
     console.log = oldConsoleLog;
   });
 
@@ -27,10 +35,10 @@ describe('Mongooseeder', () => {
       clean: true,
       mongoose: mongoose,
       seeds: () => {
-        return models.User.create({ email });
+        return User.create({ email });
       }
     })
-      .then(() => models.User.findOne())
+      .then(() => User.findOne())
       .then(user => {
         expect(user.email).toBe(email);
         done();
@@ -41,14 +49,14 @@ describe('Mongooseeder', () => {
   it('cleans', done => {
     const email = 'foo@bar.com';
 
-    models.User.create({ email })
+    User.create({ email })
       .then(() => {
         mongooseeder.clean({
           mongodbUrl: mongodbUrl,
           models: models,
           mongoose: mongoose
         })
-          .then(() => models.User.count())
+          .then(() => User.count())
           .then(count => {
             expect(count).toBe(0);
             done();
