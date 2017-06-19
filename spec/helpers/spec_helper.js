@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 process.env.NODE_ENV = 'test';
 
 
-beforeAll((done) => {
+beforeEach((done) => {
   if (mongoose.connection.readyState) {
     done();
   } else {
