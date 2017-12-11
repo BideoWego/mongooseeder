@@ -15,9 +15,9 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "bluebird": "^3.5.0",
-    "jasmine": "^2.6.0",
-    "mongoose": "^4.10.6"
+    "bluebird": "^3.5.1",
+    "jasmine": "^2.8.0",
+    "mongoose": "^4.13.6"
   },
   "homepage": "https://github.com/BideoWego/mongooseeder/",
   "repository": {
